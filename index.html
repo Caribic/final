@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caribic10 PhotoCollage</title>
+
+    <link rel="manifest" href="manifest.json">
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Caribic10">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3342/3342137.png">
+
+    <style>
+        :root {
+            --body-bg: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            --panel-bg: rgba(30, 41, 59, 0.7);
+            --panel-border: rgba(255, 255, 255, 0.08);
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --success-color: #10b981;
+            --success-hover: #059669;
+            --danger-color: #ef4444;
+            --danger-hover: #dc2626;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --input-bg: #0f172a;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: var(--body-bg);
+            background-attachment: fixed;
+            color: var(--text-main);
+            margin: 0;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            font-weight: 800;
+            font-size: 2.2rem;
+            margin-bottom: 30px;
+            text-align: center;
+            background: linear-gradient(to right, #6366f1, #a855f7, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.05em;
+        }
+
+        .app-container {
+            display: flex;
+            flex-direction: row;
+            gap: 30px;
+            max-width: 1200px;
+            width: 100%;
+            background: var(--panel-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 30px;
+            border-radius: 24px;
+            border: 1px solid var(--panel-border);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            box-sizing: border-box;
+        }
+
+        @media (max-width: 900px) {
+            .app-container { flex-direction: column; padding: 20px; }
+        }
+
+        .control-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+            min-width: 300px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+        }
+
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--panel-border);
+            background-color: var(--input-bg);
+            color: var(--text-main);
+            font-size: 0.95rem;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 16px;
+        }
+
+        select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+        }
+
+        .file-upload-wrapper {
+            position: relative;
+        }
+        input[type="file"] { display: none; }
+        .file-upload-btn {
+            display: block;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px dashed rgba(255, 255, 255, 0.15);
+            padding: 24px 16px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-main);
+            transition: all 0.2s ease;
+        }
+        .file-upload-btn:hover {
+            background: rgba(99, 102, 241, 0.08);
+            border-color: var(--primary-color);
+            color: #a5b4fc;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            background: var(--input-bg);
+            border-radius: 8px;
+            outline: none;
+            margin: 10px 0;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            background: #818cf8;
+        }
+
+        .preview-panel {
+            flex: 1.5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+            justify-content: center;
+        }
+
+        canvas {
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--panel-border);
+            max-width: 100%;
+            height: auto !important;
+        }
+
+        .download-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--success-color) 0%, #059669 100%);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+        .download-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .reset-btn {
+            width: 100%;
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: -5px;
+        }
+        .reset-btn:hover {
+            background: var(--danger-color);
+            color: white;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+        }
+
+        .thumbnails-container {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid var(--panel-border);
+            border-radius: 16px;
+            padding: 16px;
+            box-sizing: border-box;
+        }
+        .thumb-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            display: block;
+            margin-bottom: 12px;
+        }
+        .thumb-list {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding-bottom: 6px;
+        }
+        .thumb-list::-webkit-scrollbar { height: 6px; }
+        .thumb-list::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.02); border-radius: 8px; }
+        .thumb-list::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 8px; }
+
+        .thumb-item {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: var(--input-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 10px;
+            padding: 6px;
+            transition: border-color 0.2s;
+        }
+        .thumb-item:hover { border-color: rgba(99, 102, 241, 0.5); }
+        .thumb-item img { width: 75px; height: 75px; object-fit: cover; border-radius: 6px; }
+        .thumb-controls { display: flex; justify-content: space-between; width: 100%; margin-top: 6px; gap: 4px; }
+        
+        .thumb-nav-btn {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--panel-border);
+            border-radius: 6px;
+            color: var(--text-main);
+            cursor: pointer;
+            font-size: 11px;
+            padding: 4px 0;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        .thumb-nav-btn:hover:not(:disabled) { background: var(--primary-color); border-color: var(--primary-color); }
+        .thumb-nav-btn:disabled { opacity: 0.2; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+    <h1>Caribic10 PhotoCollage</h1>
+    
+    <div class="app-container">
+        <div class="control-panel">
+            <div class="control-group">
+                <label>Vložit fotografie</label>
+                <div class="file-upload-wrapper">
+                    <label for="upload" class="file-upload-btn">📁 Přetáhnout nebo vybrat fotky</label>
+                    <input type="file" id="upload" accept="image/*" multiple>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label for="ratioSelect">Poměr stran koláže</label>
+                <select id="ratioSelect">
+                    <option value="1:1">1:1 (Čtverec)</option>
+                    <option value="3:2">3:2 (Na šířku)</option>
+                    <option value="2:3">2:3 (Na výšku)</option>
+                    <option value="3:4">3:4 (Na výšku)</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="layoutSelect">Orientace mřížky</label>
+                <select id="layoutSelect">
+                    <option value="landscape">Přednostně na šířku (Více sloupců)</option>
+                    <option value="portrait">Přednostně na výšku (Více řádků)</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="fitMode">Vyplnění buňky</label>
+                <select id="fitMode">
+                    <option value="cover">Vyplnit a oříznout (rovnoměrná mřížka)</option>
+                    <option value="contain">Zachovat celou fotku (bez oříznutí)</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="bgColor">Barva mezer v koláži</label>
+                <select id="bgColor">
+                    <option value="#FFFFFF">Bílá</option>
+                    <option value="#000000">Černá</option>
+                    <option value="#f3f4f6">Světle šedá</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <div style="display: flex; justify-content: space-between;">
+                    <label for="gapSize">Velikost mezery</label>
+                    <span id="gapValue" style="font-size: 0.85rem; font-weight: bold; color: var(--primary-color);">10 px</span>
+                </div>
+                <input type="range" id="gapSize" min="0" max="50" value="10">
+            </div>
+
+            <button id="downloadBtn" class="download-btn">💾 Stáhnout hotovou koláž</button>
+            <button id="resetBtn" class="reset-btn">🗑️ Vyčistit plátno</button>
+        </div>
+
+        <div class="preview-panel">
+            <canvas id="canvas"></canvas>
+
+            <div class="thumbnails-container" id="thumbContainer" style="display: none;">
+                <span class="thumb-title">Uspořádání a pořadí fotek</span>
+                <div class="thumb-list" id="thumbList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

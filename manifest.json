@@ -1,0 +1,16 @@
+{
+  "short_name": "Caribic10",
+  "name": "Caribic10 PhotoCollage",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3342/3342137.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "./index.html",
+  "background_color": "#0f172a",
+  "theme_color": "#1e1b4b",
+  "display": "standalone",
+  "orientation": "portrait"
+}
