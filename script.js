@@ -23,12 +23,36 @@ gapSizeInput.addEventListener('input', () => {
     renderCanvas();
 });
 
-downloadBtn.addEventListener('click', () => {
+// OPRAVENÁ FUNKCE: Podpora pro stahování a ukládání na iPhone (iOS)
+downloadBtn.addEventListener('click', async () => {
     if (images.length === 0) return;
-    const link = document.createElement('a');
-    link.download = 'moje-kolaz.png';
-    link.href = canvas.toDataURL('image/png');
-    link.click();
+
+    // Převedeme plátno na datové URL (obrázek)
+    const dataUrl = canvas.toDataURL('image/png');
+
+    // Kontrola, zda zařízení (např. iPhone) podporuje nativní sdílení souborů
+    if (navigator.canShare && navigator.share) {
+        try {
+            // Převedeme dataUrl na skutečný soubor typu Blob, aby ho iOS přijal
+            const blob = await (await fetch(dataUrl)).blob();
+            const file = new File([blob], 'moje-kolaz.png', { type: 'image/png' });
+
+            // Vyvoláme nativní iOS sdílecí okno
+            await navigator.share({
+                files: [file],
+                title: 'Moje Koláž',
+                text: 'Koláž vytvořená v aplikaci Caribic10'
+            });
+        } catch (error) {
+            console.log('Sdílení bylo zrušeno nebo selhalo:', error);
+        }
+    } else {
+        // Stará metoda pro běžné počítačové prohlížeče, které share API nepodporují
+        const link = document.createElement('a');
+        link.download = 'moje-kolaz.png';
+        link.href = dataUrl;
+        link.click();
+    }
 });
 
 resetBtn.addEventListener('click', () => {
